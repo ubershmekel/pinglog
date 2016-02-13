@@ -1,3 +1,4 @@
+import sys
 import re
 import subprocess
 
@@ -8,8 +9,22 @@ class HostNotFoundError(Exception):
 class TimeoutError(PingError):
     pass
 
+_platform = sys.platform
+if _platform == "linux" or _platform == "linux2":
+    # linux
+    count_param = '-c'
+    latency_pattern = 'time=([0-9\.]+) ms'
+elif _platform == "darwin":
+    # OS X, dunno if this is correct
+    count_param = '-c'
+    latency_pattern = 'time=([0-9]+)ms'
+elif _platform == "win32":
+    # Windows...
+    count_param = '-n'
+    latency_pattern = 'time=([0-9]+)ms'
+
 def ping(host):
-    process = subprocess.Popen(['ping', '-n', '1', host], stdout=subprocess.PIPE)
+    process = subprocess.Popen(['ping', count_param, '1', host], stdout=subprocess.PIPE)
     out, err = process.communicate()
     #print(out)
     code = process.returncode
@@ -20,11 +35,11 @@ def ping(host):
             raise HostNotFoundError(out)
         raise Exception("Failed ping exit: %d, output: %s" % (code, out))
     
-    latency_found = re.findall(rb'time=([0-9]+)ms', out)
+    latency_found = re.findall(latency_pattern, out)
     if latency_found:
-        return int(latency_found[0])
+        return float(latency_found[0])
     #if 'Request timed out' in out or 'subprocess.CalledProcessError' in out:
-    raise Exception(out + err)
+    raise Exception("Failed to parse ping output %s %s" % (out, err))
     
 if __name__ == "__main__":
     print(ping('cnn.com'))

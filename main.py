@@ -3,6 +3,7 @@ import models
 import ping
 import time
 import datetime
+import traceback
 
 def ping_once(session, host):
     latency = None
@@ -13,6 +14,7 @@ def ping_once(session, host):
         print(latency)
     except Exception as e:
         error = str(e)
+        traceback.print_exc()
     
     ping_inst = models.Ping(
         date = when,
