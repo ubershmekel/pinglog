@@ -21,7 +21,7 @@ elif _platform == "darwin":
 elif _platform == "win32":
     # Windows...
     count_param = '-n'
-    latency_pattern = 'time=([0-9]+)ms'
+    latency_pattern = 'time[=<]([0-9]+)ms'
 
 def ping(host):
     process = subprocess.Popen(['ping', count_param, '1', host], stdout=subprocess.PIPE)
@@ -35,7 +35,7 @@ def ping(host):
             raise HostNotFoundError(out)
         raise Exception("Failed ping exit: %d, output: %s" % (code, out))
     
-    latency_found = re.findall(latency_pattern, out)
+    latency_found = re.findall(latency_pattern, out.decode('utf-8'))
     if latency_found:
         return float(latency_found[0])
     #if 'Request timed out' in out or 'subprocess.CalledProcessError' in out:

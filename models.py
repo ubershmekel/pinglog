@@ -18,7 +18,7 @@ class EasyRepr(object):
 class Ping(Base, EasyRepr):
     __tablename__ = 'pings'
     date = Column(DateTime, primary_key=True)
-    latency = Column(Integer, nullable=True)
+    latency = Column(Float, nullable=True)
     error = Column(String, nullable=True)
 
 def open_db(host):
