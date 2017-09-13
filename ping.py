@@ -17,7 +17,7 @@ if _platform == "linux" or _platform == "linux2":
 elif _platform == "darwin":
     # OS X, dunno if this is correct
     count_param = '-c'
-    latency_pattern = 'time=([0-9]+)ms'
+    latency_pattern = 'time=([0-9\.]+)\s*ms'
 elif _platform == "win32":
     # Windows...
     count_param = '-n'
@@ -39,7 +39,7 @@ def ping(host):
     if latency_found:
         return float(latency_found[0])
     #if 'Request timed out' in out or 'subprocess.CalledProcessError' in out:
-    raise Exception("Failed to parse ping output %s %s" % (out, err))
+    raise Exception("Failed to parse ping output '%s' '%s'" % (out, err))
     
 if __name__ == "__main__":
     print(ping('cnn.com'))
