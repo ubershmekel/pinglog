@@ -12,6 +12,7 @@ import json
 import os
 
 SECONDS_BETWEEN_PINGS = 10
+DEFAULT_DB_FILE = 'pingsdb.sqlite'
 
 def ping_once(session, host):
     latency = None
@@ -33,7 +34,7 @@ def ping_once(session, host):
     session.commit()
     print(ping_inst)
 
-def ping_loop(hosts, db_file='pingsdb.sqlite'):
+def ping_loop(hosts, db_file=DEFAULT_DB_FILE):
     session = models.open_db(db_file)
     while True:
         for host in hosts:

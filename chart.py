@@ -25,12 +25,16 @@ def chart(pings):
     print(min(xs))
     print(max(xs))
     plt.xlim((min(xs), max(xs)))
+    plt.ylim((0, max(ys + red_ys)))
     plt.scatter(xs, ys, alpha=0.1)
     plt.scatter(red_xs, red_ys, c='r', s=100)
 
-for host in main.get_hosts():
-    session = models.open_db(host)
-    chart(session.query(models.Ping))
+since = datetime.datetime.now() - datetime.timedelta(days=14)
+
+for db_file in glob.glob('*.sqlite'):
+    session = models.open_db(db_file)
+    chart(session.query(models.Ping).filter(models.Ping.date > since))
+ 
 
 plt.show()
 
