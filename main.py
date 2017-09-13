@@ -1,11 +1,17 @@
+"""
+Ping 
+"""
+
 import sys
 import models
 import ping
 import time
 import datetime
 import traceback
-import csv
+import json
 import os
+
+SECONDS_BETWEEN_PINGS = 10
 
 def ping_once(session, host):
     latency = None
@@ -13,32 +19,40 @@ def ping_once(session, host):
     when = datetime.datetime.now()
     try:
         latency = ping.ping(host)
-        print(latency)
     except Exception as e:
         error = str(e)
         traceback.print_exc()
     
     ping_inst = models.Ping(
         date = when,
+        host = host,
         latency = latency,
         error = error,
     )
     session.merge(ping_inst)
     session.commit()
+    print(ping_inst)
 
-def ping_loop(hosts):
+def ping_loop(hosts, db_file='pingsdb.sqlite'):
+    session = models.open_db(db_file)
     while True:
         for host in hosts:
-            session = models.open_db(host)
             ping_once(session, host)
-        time.sleep(10)
+        time.sleep(SECONDS_BETWEEN_PINGS)
 
 def get_hosts():
-    ping_hosts_file = 'hosts.csv'
-    if os.path.exists(ping_hosts_file):
-        reader = csv.DictReader(open(ping_hosts_file))
-        hosts = [row['host'] for row in reader]
-        return hosts
+    """
+    Example configuration file:
+        {
+            "hosts": ["8.8.8.8"]
+        }
+    """
+    ping_config_file = 'config.json'
+    if os.path.exists(ping_config_file):
+        print('Loading config from %s' % ping_config_file)
+        config = json.load(open(ping_config_file))
+        if 'hosts' in config:
+            return config['hosts']
     else:
         return []
 
