@@ -18,11 +18,11 @@ class EasyRepr(object):
 class Ping(Base, EasyRepr):
     __tablename__ = 'pings'
     date = Column(DateTime, primary_key=True)
+    host = Column(String, primary_key=True)
     latency = Column(Float, nullable=True)
     error = Column(String, nullable=True)
 
-def open_db(host):
-    fname = host + '.sqlite'
+def open_db(fname):
     engine = create_engine('sqlite:///' + fname)#, echo=True)
     Base.metadata.create_all(engine)
     make_session = sessionmaker(bind=engine)
