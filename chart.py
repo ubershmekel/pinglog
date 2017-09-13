@@ -1,6 +1,7 @@
 #! python3
 
 import matplotlib.pyplot as plt
+import datetime
 
 import models
 import main
@@ -26,9 +27,11 @@ def chart(pings):
     plt.scatter(xs, ys, alpha=0.1)
     plt.scatter(red_xs, red_ys, c='r', s=100)
 
+since = datetime.datetime.now() - datetime.timedelta(days=14)
+
 for host in main.get_hosts():    
     session = models.open_db(host)
-    chart(session.query(models.Ping))
+    chart(session.query(models.Ping).filter(models.Ping.date > since))
 
 plt.show()
 
